@@ -1,3 +1,8 @@
+const scaleNames = {
+    c : 'Celsius',
+    f : 'Fahrenheit'
+}
+
 function BoilingVerdict(props){
     if (props.celsius >= 100) {
         return <div className="alert alert-success"> L'eau bout </div>
@@ -5,12 +10,42 @@ function BoilingVerdict(props){
     return <div className="alert alert-info">L'eau ne bout pas</div>
 }
 
-function Field (props) {
-    return <div className="form-group">
-        <label htmlFor={name}> {children}</label>
-        <input type="text" value={value} onChange={onChange} id={name} name={name} className="form-control"/>
-        <BoilingVerdict celsius={value}/>
-    </div>
+function toCelsius(fahrenheit) {
+    return  (fahrenheit - 32) * 5 / 9
+}
+
+function toFahrenheit(celsius) {
+    return (celsius * 9 / 5) + 32
+}
+
+function tryConvert (temperature, convert) {
+    const value = parseFloat(temperature)
+    if (Number.isNaN(value)) {
+        return '';
+    }
+    return (Math.round(convert(value) * 100) / 100).toString()
+}
+
+class TemperatureInput extends React.Component {
+    
+    constructor(props) {
+        super(props)
+        this.handleChange = this.handleChange.bind(this)
+    }
+
+    handleChange(e) {
+        this.props.onTemperatureChange(e.target.value)
+    }
+
+    render () {
+        const scale = scaleNames[this.props.scale]
+        console.log(scale);
+        const temperature = this.props.temperature
+        return <div className="form-group">
+            <label htmlFor={scale}>Temperature (en {scale}) : </label>
+            <input id={scale} value={temperature} className="form-control" onChange={this.handleChange} />
+        </div>
+    }
 }
 
 class Calculator extends React.Component {
@@ -18,23 +53,39 @@ class Calculator extends React.Component {
     constructor(props) {
         super (props)
         this.state = {
-            celsius : ''
+            scale : 'c',
+            temperature : 20
         }
-        this.handleChange = this.handleChange.bind(this)
+        this.handleCelsiusChange = this.handleCelsiusChange.bind(this)
+        this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this)     
     }
 
-    handleChange(e) {
-        const value = e.target.value
-        this.setState ({
-            celsius : value
+    handleCelsiusChange(temperature) {
+        this.setState({
+            scale : 'c',
+            temperature
         })
+
+    }
+
+    handleFahrenheitChange(temperature) {
+        this.setState({
+            scale : 'f',
+            temperature
+        })
+
     }
 
     render() {
-        const celcius = this.state.celsius
+        const temperature = this.state.temperature
+        const scale = this.state.scale
+        const celsius = (scale === 'c' ? temperature : tryConvert(temperature, toCelsius))
+        const fahrenheit = (scale === 'f' ? temperature : tryConvert(temperature, toFahrenheit))
+        console.log(celsius)
         return <div>
-            <input value={celcius} onChange={this.handleSubmit} />
-            <BoilingVerdict celcius={parseFloat(celcius)} />
+            <TemperatureInput scale="c" temperature={celsius} onTemperatureChange={this.handleCelsiusChange}/>
+            <TemperatureInput scale="f" temperature={fahrenheit} onTemperatureChange={this.handleFahrenheitChange}/>
+            <BoilingVerdict celsius={celsius} />
         </div>
     }
 }
