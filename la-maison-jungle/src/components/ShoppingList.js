@@ -34,10 +34,10 @@ function ShoppingList({cart, updateCart}) {
 
 	return (
         <div>
-            <Categories setSelectCat={setSelectCat} selectedCat={selectedCat}  cartegories={category}/>
+            <Categories setSelectCat={setSelectCat} selectedCat={selectedCat}  cartegories={listCategory}/>
             <ul className='lmj-plant-list'>
                 {
-                    plantList.map(({ id, cover, name, water, light, price }) =>
+                    plantList.map(({ id, cover, name, water, light, price, category }) =>
                     !selectedCat || selectedCat === category ? 
                     (
                         <div key={id}>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import '../styles/Cart.css'
 
 
@@ -7,6 +7,11 @@ function Cart({cart, updateCart}) {
     const total = cart.reduce(
         (accu, currVal) => accu + (currVal.price * currVal.amount), 0
     )
+
+    useEffect(() => {
+        document.title = total > 0 ? `LMJ: ${total}€ d'achats` : 'LMJ'
+    }, [total])
+    
     return (
         (isOpen === true) ? 
             (<div className='lmj-cart'>
